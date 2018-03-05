@@ -1,0 +1,128 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: first-blog-mern-api
+  description: first swagger documentation
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /posts:
+    x-swagger-router-controller: postService
+    get:
+      operationId: getAllPosts
+      summary: gets all posts
+      description: returns a list of all posts
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/PostListResponse"
+
+        "400":
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /posts/{_id}:
+    x-swagger-router-controller: postService
+    get:
+      operationId: getOnePost
+      summary: gets one post
+      description: returns a single post
+      parameters:
+        - $ref: "#/parameters/postId"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Post"
+        "404":
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /post_new:
+    x-swagger-router-controller: postService
+    post:
+      operationId: createNewPost
+      summary: creates a post
+      description: returns a new post
+      parameters:
+        - $ref: "#/parameters/newPost"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GeneralResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  Post:
+    required:
+      - title
+      - body
+    properties:
+      _id:
+        type: string
+      title:
+        type: string
+      author:
+        type: string
+        default: Anonymous
+      body:
+        type: string
+      date:
+        type: string
+        default: Date()
+  PostListResponse:
+    type: array
+    items:
+      $ref: "#/definitions/Post"
+  GeneralResponse:
+    type: object
+    properties:
+      success:
+        type: number
+        description: returns 1 if successful
+      description:
+        type: string
+        description: a short comment 
+    required:
+      - success
+      - description
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+parameters:
+  postId:
+    name: _id
+    in: path
+    required: true
+    description: The post's id
+    type: string
+  newPost:
+    name: post
+    in: body
+    required: true
+    description: Post properties
+    schema:
+      $ref: "#/definitions/Post"
